@@ -8,9 +8,9 @@ export class FundsService {
     getSimulationFunds():Object[] {
       return [
         {
-          "category": "category 1",
-          "column-1": 8,
-          "column-2": [
+          "category": "RENTA FIJA",
+          "total": 60,
+          "composition": [
             { "name": "RENTA FIJA MONETARIOS", "value": "10%" },
             { "name": "RENTA FIJA CORTO PLAZO", "value": "10%" },
             { "name": "RENTA FIJA LARGO PLAZO", "value": "30%" },
@@ -18,23 +18,20 @@ export class FundsService {
           ]
         },
         {
-          "category": "category 2",
-          "column-1": 6,
-          "column-2": [
-            { "name": "RENTA FIJA MONETARIOS", "value": "30%" },
-            { "name": "RENTA FIJA CORTO PLAZO", "value": "10%" },
-            { "name": "RENTA FIJA LARGO PLAZO", "value": "30%" },
-            { "name": "RENTA FIJA FLEXIBLE", "value": "10%" },
+          "category": "RENTA VARIABLE",
+          "total": 30,
+          "composition": [
+            { "name": "RENTA VARIABLE A", "value": "20%" },
+            { "name": "RENTA VARIABLE B", "value": "10%" },
           ]
         },
         {
-          "category": "category 3",
-          "column-1": 2,
-          "column-2": [
-            { "name": "RENTA FIJA MONETARIOS", "value": "40%" },
-            { "name": "RENTA FIJA CORTO PLAZO", "value": "10%" },
-            { "name": "RENTA FIJA LARGO PLAZO", "value": "30%" },
-            { "name": "RENTA FIJA FLEXIBLE", "value": "10%" },
+          "category": "OTROS",
+          "total": 10,
+          "composition": [
+            { "name": "MIXTO A", "value": "5%" },
+            { "name": "INMOBILIARIO ESPECIAL", "value": "2.5%" },
+            { "name": "GARANTIZADO BKT", "value": "2.5%" }
           ]
         }
       ];
