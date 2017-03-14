@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 
 @Component({
-  selector: 'chart',
-  templateUrl: 'chart.component.html'
+  selector: 'donut-chart',
+  templateUrl: 'donut-chart.component.html'
 })
 export class ChartComponent implements OnInit {
   private id = "chartdiv";
