@@ -1,24 +1,30 @@
-import {Component, OnInit, Input} from '@angular/core';
+import {Component, OnInit, Input, AfterViewInit, ViewChild} from '@angular/core';
 
 @Component({
   selector: 'donut-chart',
   templateUrl: 'donut-chart.component.html'
 })
 export class DonutChartComponent implements OnInit {
+  // TODO Maybe it's better just create an object with all the configuration
   @Input() chartData: Object;
   @Input() chartid: string;
+  @Input() textField: string;
+  @Input() valueField: string;
+
+  @ViewChild('chart') chart;
 
   private options;
 
   constructor() {
-
+    //this.chartObj = {};
   }
 
   ngOnInit() {
     // TODO: This would be "default options". It's better to slice in different attributes: colors, legend, label, ballons, ...
+    // Legend data maybe has to be an input
     this.options = {
       "type": "pie",
-      "balloonFunction": this._formatContent,
+      "balloonFunction": this._formatTooltipContent,
       "innerRadius": "30%",
       "labelText": "[[percents]]%",
       "labelRadius": -50,
@@ -29,8 +35,8 @@ export class DonutChartComponent implements OnInit {
         "#13cec4",
         "#db9e01"
       ],
-      "titleField": "category",
-      "valueField": "total",
+      "titleField": this.textField,
+      "valueField": this.valueField,
       "allLabels": [],
       "balloon": {
         "borderColor": "#000000",
@@ -42,24 +48,28 @@ export class DonutChartComponent implements OnInit {
         "enabled": true,
         "align": "center",
         "position": "absolute",
-        "color":"#595959",
+        "color": "#595959",
         "fontSize": 13,
         "top": 10,
         "markerLabelGap": 0,
-        "data": [
-          {"title": "RENTA FIJA", "value": "60% |", "markerType": "none", "color":"#595959"},
-          {"title": "RENTA VARIABLE", "value": "30% |", "markerType": "none", "color":"#595959"},
-          {"title": "OTROS", "value": "10%", "markerType": "none", "color":"#595959"},
-        ]
+        "markerType": "none",
+        "switchable": false
+        /*"data": [
+         {"title": "RENTA FIJA", "value": "60% |", "markerType": "none", "color":"#595959"},
+         {"title": "RENTA VARIABLE", "value": "30% |", "markerType": "none", "color":"#595959"},
+         {"title": "OTROS", "value": "10%", "markerType": "none", "color":"#595959"},
+         ]*/
       },
       "titles": [],
       "dataProvider": this.chartData
     };
   }
 
-  private _formatContent(graphDataItem:any) {
-    let funds:Object[] = graphDataItem.dataContext['composition'];
-    let fundHTML:any = document.createElement('table');
+
+  private _formatTooltipContent(graphDataItem: any) {
+    // TODO set a better name for this field. For instantce: slice tooltip
+    let funds: Object[] = graphDataItem.dataContext['composition'];
+    let fundHTML: any = document.createElement('table');
 
     for (let fund of funds) {
       let fundTR = document.createElement('tr');
