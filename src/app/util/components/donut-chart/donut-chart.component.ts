@@ -24,7 +24,7 @@ export class DonutChartComponent implements OnInit {
     // Legend data maybe has to be an input
     this.options = {
       "type": "pie",
-      "balloonFunction": this._formatTooltipContent,
+      "balloonFunction": DonutChartComponent._formatTooltipContent,
       "innerRadius": "30%",
       "labelText": "[[percents]]%",
       "labelRadius": -50,
@@ -53,7 +53,8 @@ export class DonutChartComponent implements OnInit {
         "top": 10,
         "markerLabelGap": 0,
         "markerType": "none",
-        "switchable": false
+        "switchable": false,
+        "divId": "legend-kk"
         /*"data": [
          {"title": "RENTA FIJA", "value": "60% |", "markerType": "none", "color":"#595959"},
          {"title": "RENTA VARIABLE", "value": "30% |", "markerType": "none", "color":"#595959"},
@@ -66,7 +67,7 @@ export class DonutChartComponent implements OnInit {
   }
 
 
-  private _formatTooltipContent(graphDataItem: any) {
+  static _formatTooltipContent(graphDataItem: any) {
     // TODO set a better name for this field. For instantce: slice tooltip
     let funds: Object[] = graphDataItem.dataContext['composition'];
     let fundHTML: any = document.createElement('table');
