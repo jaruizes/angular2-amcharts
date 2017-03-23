@@ -7,8 +7,8 @@ import {Component, OnInit, Input, AfterViewInit, ViewChild, ElementRef} from '@a
 })
 export class DonutChartComponent implements OnInit, AfterViewInit {
 
-  @ViewChild('legendDiv') legendDiv:ElementRef;
-  @ViewChild('legendContainer') legendContainer:ElementRef;
+  @ViewChild('legendTooltipDiv') legendTooltipDiv:ElementRef;
+  @ViewChild('legendTooltipContainer') legendTooltipContainer:ElementRef;
 
   /*
    Each object of the array has the following structure:
@@ -38,8 +38,8 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    let legendDiv:ElementRef = this.legendDiv;
-    let legendContainer:ElementRef = this.legendContainer;
+    let legendTooltipDiv:ElementRef = this.legendTooltipDiv;
+    let legendTooltipContainer:ElementRef = this.legendTooltipContainer;
     let chartsEngine = (window as any).AmCharts;
     let chartData: Object[] = this.data;
 
@@ -108,7 +108,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
         if (balloon.item) {
           chart.balloon.enabled = false;
           balloon.container.innerHTML = balloon.item.dataContext['legendTooltip'];
-          balloon.wrapper.style.top = (e.clientY - balloon.container.offsetHeight + 50) + "px";
+          balloon.wrapper.style.top = (e.clientY + 20) + "px";
           balloon.wrapper.style.left = (e.clientX) + "px";
           balloon.wrapper.className = "amcharts-legend-balloon active";
         } else {
@@ -120,9 +120,9 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
 
     // CREATE, PLACE ELEMENTS
     chart.addListener("drawn", function(e) {
-      e.chart.legend.balloon.wrapper = legendDiv.nativeElement;
+      e.chart.legend.balloon.wrapper = legendTooltipDiv.nativeElement;
       e.chart.legend.balloon.wrapper.className = "amcharts-legend-balloon";
-      e.chart.legend.balloon.container = legendContainer.nativeElement;
+      e.chart.legend.balloon.container = legendTooltipContainer.nativeElement;
       e.chart.legend.balloon.wrapper.appendChild(e.chart.legend.balloon.container);
       e.chart.legend.div.appendChild(e.chart.legend.balloon.wrapper);
     });
