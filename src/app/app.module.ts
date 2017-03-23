@@ -4,7 +4,6 @@ import {AppComponent} from './app.component';
 import {BrowserModule} from "@angular/platform-browser";
 import {FormsModule} from "@angular/forms";
 import {NgModule} from "@angular/core";
-import {AmChartsModule} from "amcharts3-angular2";
 import {DonutChartComponent} from "./util/components/donut-chart/donut-chart.component";
 import {FundsService} from "./services/funds.service";
 import {ChartComponent} from "./util/components/chart/chart.component";
@@ -19,8 +18,7 @@ import {ChartComponent} from "./util/components/chart/chart.component";
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule,
-    AmChartsModule
+    HttpModule
   ],
   providers: [FundsService],
   bootstrap: [AppComponent]

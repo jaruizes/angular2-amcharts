@@ -24,7 +24,7 @@ export class AppComponent {
       dataItem['label'] = d['category'];
       dataItem['value'] = d['total'];
       dataItem['graphTooltip'] = AppComponent.buildTooltipGraph(d['composition']);
-      dataItem['legendTooltip'] = '<p>Esto es el tooltip de ' + d['category'] + '</p>';
+      dataItem['legendTooltip'] = 'Esto es el tooltip de ' + d['category'];
       dataItem['color'] = colors[i++];
       this.chartData.push(dataItem);
     }
