@@ -18,7 +18,7 @@
 
 .amcharts-legend-balloon > div:after,
 .amcharts-legend-balloon > div:before {
-  top: 100%;
+  bottom: 100%;
   left: 50%;
   border: solid transparent;
   content: " ";
@@ -30,14 +30,14 @@
 
 .amcharts-legend-balloon > div:after {
   border-color: rgba(0, 0, 0, 0);
-  border-top-color: #000000;
+  border-bottom-color: #000000;
   border-width: 6px;
   margin-left: -6px;
 }
 
 .amcharts-legend-balloon > div:before {
   border-color: rgba(0, 0, 0, 0);
-  border-top-color: inherit;
+  border-bottom-color: inherit;
   border-width: 9px;
   margin-left: -9px;
 }

@@ -108,7 +108,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
         if (balloon.item) {
           chart.balloon.enabled = false;
           balloon.container.innerHTML = balloon.item.dataContext['legendTooltip'];
-          balloon.wrapper.style.top = (e.clientY - balloon.container.offsetHeight - 6) + "px";
+          balloon.wrapper.style.top = (e.clientY - balloon.container.offsetHeight + 50) + "px";
           balloon.wrapper.style.left = (e.clientX) + "px";
           balloon.wrapper.className = "amcharts-legend-balloon active";
         } else {
