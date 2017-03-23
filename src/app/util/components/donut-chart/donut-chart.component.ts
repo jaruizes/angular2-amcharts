@@ -29,7 +29,6 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
   @Input() options: Object;
 
   constructor() {
-    console.log('Chart constructor.....');
   }
 
   ngOnInit() {
@@ -43,30 +42,13 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
     let legendContainer:ElementRef = this.legendContainer;
     let chartsEngine = (window as any).AmCharts;
     let chartData: Object[] = this.data;
-    let graphs:Object[] = [];
-
-    for (let d of chartData) {
-      let graphObj = {
-        "fillAlphas": 0.8,
-        "labelText": "[[value]]",
-        "lineAlpha": 0.3,
-        "type": "column",
-        "color": "#000000"
-      };
-
-      graphObj['title'] = d['legendTooltip'];
-      graphObj['valueField'] = d['category'];
-      graphs.push(graphObj);
-    }
-
-    console.log(graphs);
 
     let chart: any = chartsEngine.makeChart(this.options['id'], {
       "type": "pie",
       "titleField": "label",
       "valueField": "value",
       "labelText": "[[percents]]%",
-      "allLabels": [],
+      "addClassNames": true,
       "labelRadius": -50,
       "innerRadius": "30%",
       "color": "#FFFFFF",
@@ -81,7 +63,6 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
         "markerType": "none",
         "switchable": false
       },
-      "graphs": graphs,
       "balloonFunction": DonutChartComponent.getGraphTooltip,
       "balloon": {
         "borderColor": "#000000",
@@ -90,7 +71,6 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
         "fillColor": "#000000"
       },
       "colors": DonutChartComponent.getColorsArray(chartData),
-      "titles": [],
       "dataProvider": chartData
     });
 
@@ -102,15 +82,6 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
         mousemove: e.chart.handleMouseMove,
         titles: {}
       };
-
-      // PRETTIFY AND CACHE GRAPH TITLES
-      for (let i1 = 0; i1 < e.chart.graphs.length; i1++) {
-        let graph = e.chart.graphs[i1];
-        let gid = graph.id || chartsEngine.getUniqueId();
-
-        e.chart.legend.balloon.titles[gid] = graph.title;
-        graph.id = gid;
-      }
 
       // FORCE REVALIDATION TO APPLY GRAPH IDS
       setTimeout(function() {
@@ -135,13 +106,14 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
         balloon.mousemove.apply(this, arguments);
 
         if (balloon.item) {
-          balloon.container.style.borderColor = balloon.item.lineColorR;
+          chart.balloon.enabled = false;
           balloon.container.innerHTML = balloon.item.dataContext['legendTooltip'];
           balloon.wrapper.style.top = (e.clientY - balloon.container.offsetHeight - 6) + "px";
           balloon.wrapper.style.left = (e.clientX) + "px";
           balloon.wrapper.className = "amcharts-legend-balloon active";
         } else {
           balloon.wrapper.className = "amcharts-legend-balloon";
+          chart.balloon.enabled = true;
         }
       }
     });
