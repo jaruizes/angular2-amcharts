@@ -25,7 +25,7 @@ export class LineChartComponent implements OnInit, AfterViewInit {
    */
   @Input() options: Object;
 
-  private graphs:Object[];
+  private graphs: Object[];
 
   constructor() {
   }
@@ -45,90 +45,51 @@ export class LineChartComponent implements OnInit, AfterViewInit {
       "categoryField": "month",
       "color": "#FFFFFF",
       "chartScrollbar": {
-        "graph":"g1",
-        "gridAlpha":0,
-        "color":"#888888",
-        "scrollbarHeight":55,
-        "backgroundAlpha":0,
-        "selectedBackgroundAlpha":0.1,
-        "selectedBackgroundColor":"#888888",
-        "graphFillAlpha":0,
-        "autoGridCount":true,
-        "selectedGraphFillAlpha":0,
-        "graphLineAlpha":0.2,
-        "graphLineColor":"#c2c2c2",
-        "selectedGraphLineColor":"#888888",
-        "selectedGraphLineAlpha":1
+        "graph": "g1",
+        "gridAlpha": 0,
+        "color": "#888888",
+        "scrollbarHeight": 55,
+        "backgroundAlpha": 0,
+        "selectedBackgroundAlpha": 0.1,
+        "selectedBackgroundColor": "#888888",
+        "graphFillAlpha": 0,
+        "autoGridCount": true,
+        "selectedGraphFillAlpha": 0,
+        "graphLineAlpha": 0.2,
+        "graphLineColor": "#c2c2c2",
+        "selectedGraphLineColor": "#888888",
+        "selectedGraphLineAlpha": 1
 
       },
       "chartCursor": {
         "categoryBalloonDateFormat": "YYYY",
         "cursorAlpha": 0,
-        "valueLineEnabled":true,
-        "valueLineBalloonEnabled":true,
-        "valueLineAlpha":0.5,
-        "fullWidth":true
+        "valueLineEnabled": true,
+        "valueLineBalloonEnabled": true,
+        "valueLineAlpha": 0.5,
+        "fullWidth": true
       },
       "categoryAxis": {
         "gridPosition": "start"
       },
       "dataProvider": chartData,
-      "graphs": [
-        {
-          "bullet": "round",
-          "bulletSize": 8,
-          "lineThickness": 2,
-          "type": "smoothedLine",
-          "valueField": "Tu cartera",
-          "title": "Tu cartera"
-        },
-        {
-          "bullet": "round",
-          "bulletSize": 8,
-          "lineThickness": 2,
-          "type": "smoothedLine",
-          "valueField": "IBEX",
-          "title": "IBEX"
-        },
-        {
-          "bullet": "round",
-          "bulletSize": 8,
-          "lineThickness": 2,
-          "type": "smoothedLine",
-          "valueField": "EUROSTOXX 50",
-          "title": "EUROSTOXX 50"
-        },
-        {
-          "bullet": "round",
-          "bulletSize": 8,
-          "lineThickness": 2,
-          "type": "smoothedLine",
-          "valueField": "S&P 500",
-          "title": "S&P 500"
-        },
-        {
-          "bullet": "round",
-          "bulletSize": 8,
-          "lineThickness": 2,
-          "type": "smoothedLine",
-          "valueField": "Nikkei 225",
-          "title": "Nikkei 225"
-        },
-        {
-          "bullet": "round",
-          "bulletSize": 8,
-          "lineThickness": 2,
-          "type": "smoothedLine",
-          "valueField": "MSCI World",
-          "title": "MSCI World"
-        }
-      ],
+      "graphs": LineChartComponent.getGraphsArray(chartData),
       "legend": {
         "align": "center",
         "periodValueText": "",
         "valueAlign": "left",
         "valueText": ""
       },
+    });
+
+    chart.addListener("init", function(e) {
+      e.chart.legend.balloon = {
+        item: false,
+        wrapper: null,
+        container: null,
+        mousemove: e.chart.handleMouseMove,
+        titles: {}
+      };
     });
   }
 
@@ -143,6 +104,28 @@ export class LineChartComponent implements OnInit, AfterViewInit {
     }
 
     return colors;
+  }
+
+  static getGraphsArray(data: Object[]) {
+    let item: Object = data[0];
+    let graphs: Object[] = [];
+    for (let property in item) {
+      if (item.hasOwnProperty(property) && property != 'month') {
+        let graph: Object = {
+          "bullet": "round",
+          "bulletSize": 8,
+          "lineThickness": 2,
+          "type": "smoothedLine",
+          "valueField": property,
+          "title": property
+        };
+
+        graphs.push(graph);
+      }
+    }
+
+    return graphs;
+
   }
 
 }
