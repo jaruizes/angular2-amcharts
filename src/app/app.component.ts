@@ -7,27 +7,33 @@ import {FundsService} from "./services/funds.service";
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  fundsChartData: Object[];
+  lineChartData: Object[];
   donutChartData: Object[];
-  chartData: Object[];
   options: Object;
 
   constructor(private fundsService: FundsService) {
-    this.donutChartData = fundsService.getSimulationFunds();
+    this.fundsChartData = fundsService.getSimulationFunds();
+    this.lineChartData = fundsService.getProfitability();
     this.options = {
-      'id': 'chart-0001'
+      'id1': 'chart-0001',
+      'id2': 'chart-0002'
     };
-    this.chartData = [];
+    this.donutChartData = [];
     let colors:string[] = ["#ffd600", "#13cec4", "#db9e01"];
     let i:number = 0;
-    for (let d of this.donutChartData) {
+    for (let d of this.fundsChartData) {
       let dataItem = {};
       dataItem['label'] = d['category'];
       dataItem['value'] = d['total'];
       dataItem['graphTooltip'] = AppComponent.buildTooltipGraph(d['composition']);
       dataItem['legendTooltip'] = 'Esto es el tooltip de ' + d['category'];
       dataItem['color'] = colors[i++];
-      this.chartData.push(dataItem);
+      this.donutChartData.push(dataItem);
     }
+
+    console.log(this.lineChartData);
+
   }
 
   static buildTooltipGraph(funds: Object[]) {

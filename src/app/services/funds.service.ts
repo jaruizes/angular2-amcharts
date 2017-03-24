@@ -37,4 +37,32 @@ export class FundsService {
       ];
     }
 
+    getProfitability():Object[] {
+      let res:Object[] = [];
+      for (let _i = 0; _i < 10; _i++) {
+        let month:number = 7 + _i;
+        let monthStr:string = month < 9 ? 'DIC-0' + month : 'DIC-' + month;
+
+        let item:Object = {
+          "month": monthStr,
+          "Tu cartera": FundsService.getRandomArbitrary(),
+          "IBEX": FundsService.getRandomArbitrary(),
+          "EUROSTOXX 50": FundsService.getRandomArbitrary(),
+          "S&P 500": FundsService.getRandomArbitrary(),
+          "Nikkei 225": FundsService.getRandomArbitrary(),
+          "MSCI World": FundsService.getRandomArbitrary()
+        };
+
+        res.push(item);
+      }
+
+      return res;
+    }
+
+    static getRandomArbitrary():number {
+      let min:number = -5;
+      let max:number = 10;
+      return Math.random() * (max - min) + min;
+    }
+
 }

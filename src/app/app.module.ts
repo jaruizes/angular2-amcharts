@@ -6,12 +6,14 @@ import {FormsModule} from "@angular/forms";
 import {NgModule} from "@angular/core";
 import {DonutChartComponent} from "./util/components/donut-chart/donut-chart.component";
 import {FundsService} from "./services/funds.service";
+import {LineChartComponent} from "./util/components/line-chart/line-chart.component";
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    DonutChartComponent
+    DonutChartComponent,
+    LineChartComponent
   ],
   imports: [
     BrowserModule,

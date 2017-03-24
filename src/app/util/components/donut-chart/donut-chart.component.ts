@@ -32,9 +32,8 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    console.log('Chart initializing.....');
+    console.log('Donut Chart initializing.....');
     console.log(this.data);
-    console.log(this.options);
   }
 
   ngAfterViewInit(): void {
@@ -43,7 +42,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
     let chartsEngine = (window as any).AmCharts;
     let chartData: Object[] = this.data;
 
-    let chart: any = chartsEngine.makeChart(this.options['id'], {
+    let chart: any = chartsEngine.makeChart(this.options['id1'], {
       "type": "pie",
       "titleField": "label",
       "valueField": "value",
