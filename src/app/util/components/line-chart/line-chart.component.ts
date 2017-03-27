@@ -115,11 +115,15 @@ export class LineChartComponent implements OnInit, AfterViewInit {
 
   static revenueCalculate(e) {
     // TODO: Set right function in order to calculate amount
+    if (e.item.graph.valueField != 'Tu cartera') {
+      return;
+    }
+
     let value:number = e.item.values.value;
     let revenue:number = (50000 * value) / 100;
 
     let tag:any = document.getElementsByClassName('amcharts-label-000023');
-    tag[0].innerHTML = 'HABRIA GANADO ' + revenue + ' €';
+    tag[0].innerHTML = 'HABRIA GANADO ' + revenue.toFixed(2) + ' €';
   }
 
   static getGraphsArray(data: Object[]) {
