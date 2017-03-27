@@ -41,10 +41,10 @@ export class FundsService {
       let res:Object[] = [];
       for (let _i = 0; _i < 10; _i++) {
         let month:number = 7 + _i;
-        let monthStr:string = month < 9 ? 'DIC-0' + month : 'DIC-' + month;
+        let date:string = month <= 9 ? '12/200' + month : '12/20' + month;
 
         let item:Object = {
-          "month": monthStr,
+          "date": date,
           "Tu cartera": FundsService.getRandomArbitrary(),
           "IBEX": FundsService.getRandomArbitrary(),
           "EUROSTOXX 50": FundsService.getRandomArbitrary(),
@@ -59,10 +59,10 @@ export class FundsService {
       return res;
     }
 
-    static getRandomArbitrary():number {
+    static getRandomArbitrary():string {
       let min:number = -5;
       let max:number = 10;
-      return Math.random() * (max - min) + min;
+      return (Math.random() * (max - min) + min).toFixed(2);
     }
 
 }

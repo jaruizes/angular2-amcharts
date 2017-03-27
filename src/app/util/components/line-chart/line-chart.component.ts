@@ -41,11 +41,10 @@ export class LineChartComponent implements OnInit, AfterViewInit {
 
     let chart: any = chartsEngine.makeChart(this.options['id2'], {
       "type": "serial",
+      "theme": "none",
       "addClassNames": true,
-      "categoryField": "month",
-      "color": "#FFFFFF",
+      "categoryField": "date",
       "chartScrollbar": {
-        "graph": "g1",
         "gridAlpha": 0,
         "color": "#888888",
         "scrollbarHeight": 55,
@@ -53,72 +52,97 @@ export class LineChartComponent implements OnInit, AfterViewInit {
         "selectedBackgroundAlpha": 0.1,
         "selectedBackgroundColor": "#888888",
         "graphFillAlpha": 0,
-        "autoGridCount": true,
         "selectedGraphFillAlpha": 0,
         "graphLineAlpha": 0.2,
         "graphLineColor": "#c2c2c2",
         "selectedGraphLineColor": "#888888",
         "selectedGraphLineAlpha": 1
-
       },
       "chartCursor": {
         "categoryBalloonDateFormat": "YYYY",
         "cursorAlpha": 0,
-        "valueLineEnabled": true,
-        "valueLineBalloonEnabled": true,
-        "valueLineAlpha": 0.5,
-        "fullWidth": true
+        "valueLineEnabled":true,
+        "valueLineBalloonEnabled":true,
+        "valueLineAlpha":0.5,
+        "fullWidth":true
       },
+      "dataDateFormat": "MM/YYYY",
       "categoryAxis": {
-        "gridPosition": "start"
+        "position" : "bottom",
+        //"parseDates": true,
+        "gridThickness": 0,
+        "minPeriod": "YYYY"
       },
       "dataProvider": chartData,
       "graphs": LineChartComponent.getGraphsArray(chartData),
       "legend": {
-        "align": "center",
-        "periodValueText": "",
+        "align": "left",
         "valueAlign": "left",
-        "valueText": ""
+        "title": "COMPARA"
       },
-    });
-
-    chart.addListener("init", function(e) {
-      e.chart.legend.balloon = {
-        item: false,
-        wrapper: null,
-        container: null,
-        mousemove: e.chart.handleMouseMove,
-        titles: {}
-      };
+      "allLabels": [
+        {
+          "text": "RENTABILIDAD AÑO A AÑO",
+          "size": "14",
+          "bold": true
+        },
+        {
+          "text": "HABRIA GANADO XXX €",
+          "x": "!30",
+          "align": "right",
+          "size": "14",
+          "bold": true,
+          "id": "000023"
+        }
+      ],
+      "valueAxes": [{
+        "axisAlpha": 0,
+        "position": "left",
+        "fontSize": 11,
+        "color": "#a9a9a9",
+        "gridThickness": 1,
+        "dashLength": 5,
+        "zeroGridAlpha": 0
+      }],
+      "listeners": [
+        {
+          "event": "rollOverGraphItem",
+          "method": LineChartComponent.revenueCalculate
+        }
+      ]
     });
   }
 
-  static getGraphTooltip(graphDataItem: any) {
-    return graphDataItem.dataContext['graphTooltip'];
-  }
+  static revenueCalculate(e) {
+    // TODO: Set right function in order to calculate amount
+    let value:number = e.item.values.value;
+    let revenue:number = (50000 * value) / 100;
 
-  static getColorsArray(data) {
-    let colors: string[] = [];
-    for (let d of data) {
-      colors.push(d['color']);
-    }
-
-    return colors;
+    let tag:any = document.getElementsByClassName('amcharts-label-000023');
+    tag[0].innerHTML = 'HABRIA GANADO ' + revenue + ' €';
   }
 
   static getGraphsArray(data: Object[]) {
     let item: Object = data[0];
     let graphs: Object[] = [];
+    let index:number = 1;
     for (let property in item) {
-      if (item.hasOwnProperty(property) && property != 'month') {
+      if (item.hasOwnProperty(property) && property != 'date') {
+        console.log('Property: ' + property);
         let graph: Object = {
           "bullet": "round",
-          "bulletSize": 8,
-          "lineThickness": 2,
+          "id": "AmGraph-" + index++,
           "type": "smoothedLine",
           "valueField": property,
-          "title": property
+          "title": property,
+          "hidden": true
         };
+
+        if (property == 'Tu cartera') {
+          graph['lineColor'] = '#00dbd0';
+          graph['fillColors'] = '#00dbd0';
+          graph['hidden'] = false;
+        }
 
         graphs.push(graph);
       }
