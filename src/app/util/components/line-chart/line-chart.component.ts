@@ -1,4 +1,4 @@
-import {Component, OnInit, Input, AfterViewInit, ViewChild, ElementRef} from '@angular/core';
+import {Component, OnInit, Input, AfterViewInit, ViewChild, ElementRef, HostListener} from '@angular/core';
 
 @Component({
   selector: 'line-chart',
@@ -6,6 +6,7 @@ import {Component, OnInit, Input, AfterViewInit, ViewChild, ElementRef} from '@a
   styleUrls: ['line-chart.component.css']
 })
 export class LineChartComponent implements OnInit, AfterViewInit {
+  @ViewChild('habriaGanadoDiv') habriaGanadoDiv:ElementRef;
 
   /*
    Each object of the array has the following structure:
@@ -25,7 +26,13 @@ export class LineChartComponent implements OnInit, AfterViewInit {
    */
   @Input() options: Object;
 
-  private graphs: Object[];
+  private revenueAmount:number;
+
+  @HostListener('document:updateRevenue', ['$event'])
+  onupdateRevenue(ev) {
+    console.log('Update revenue!!' + ev.detail);
+    this.revenueAmount = ev.detail.toFixed(2);
+  }
 
   constructor() {
   }
@@ -33,11 +40,19 @@ export class LineChartComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     console.log('Line Chart initializing.....');
     console.log(this.data);
+
+  }
+
+  private updateRevenue(value) {
+    console.log(value);
   }
 
   ngAfterViewInit(): void {
     let chartsEngine = (window as any).AmCharts;
     let chartData: Object[] = this.data;
+    let habriaGanadoDiv: any = this.habriaGanadoDiv.nativeElement;
+    let revenues = LineChartComponent.calculateGlobalRevenue(this.data, 1000);
+    let updateRevenue = this.updateRevenue;
 
     let chart: any = chartsEngine.makeChart(this.options['id2'], {
       "type": "serial",
@@ -59,7 +74,6 @@ export class LineChartComponent implements OnInit, AfterViewInit {
         "selectedGraphLineAlpha": 1
       },
       "chartCursor": {
-        "categoryBalloonDateFormat": "YYYY",
         "cursorAlpha": 0,
         "valueLineEnabled":true,
         "valueLineBalloonEnabled":true,
@@ -69,7 +83,6 @@ export class LineChartComponent implements OnInit, AfterViewInit {
       "dataDateFormat": "MM/YYYY",
       "categoryAxis": {
         "position" : "bottom",
-        //"parseDates": true,
         "gridThickness": 0,
         "minPeriod": "YYYY"
       },
@@ -87,7 +100,7 @@ export class LineChartComponent implements OnInit, AfterViewInit {
           "bold": true
         },
         {
-          "text": "HABRIA GANADO XXX €",
+          "text": "",
           "x": "!30",
           "align": "right",
           "size": "14",
@@ -107,32 +120,50 @@ export class LineChartComponent implements OnInit, AfterViewInit {
       "listeners": [
         {
           "event": "rollOverGraphItem",
-          "method": LineChartComponent.revenueCalculate
+          "method": function(e) {
+            LineChartComponent.revenueCalculate(e, revenues, habriaGanadoDiv, updateRevenue);
+          }
         }
       ]
     });
+
+    chart.addListener('init', function(e) {
+      e.chart.chartDiv.insertBefore(habriaGanadoDiv, e.chart.chartDiv.firstChild);
+    });
   }
 
-  static revenueCalculate(e) {
-    // TODO: Set right function in order to calculate amount
+  static calculateGlobalRevenue(data, initialInvestment):Object {
+    let revenues:Object = {};
+    let updatedInvestment:number = initialInvestment;
+    let investmentWithRevenue:number;
+    let yearProfitability:number;
+    for (let year of data) {
+      yearProfitability = year['Tu cartera'];
+      investmentWithRevenue = updatedInvestment * (1 + yearProfitability/100);
+      revenues[year['date']] = investmentWithRevenue;
+      updatedInvestment = investmentWithRevenue;
+    }
+
+    return revenues;
+  }
+
+  static revenueCalculate(e, revenues, habriaGanadoDiv, updateRevenue) {
     if (e.item.graph.valueField != 'Tu cartera') {
       return;
     }
 
-    let value:number = e.item.values.value;
-    let revenue:number = (50000 * value) / 100;
-
-    let tag:any = document.getElementsByClassName('amcharts-label-000023');
-    tag[0].innerHTML = 'HABRIA GANADO ' + revenue.toFixed(2) + ' €';
+    habriaGanadoDiv.style.display = 'block';
+    let revenue:number = revenues[e.item.dataContext.date];
+    let event = new CustomEvent("updateRevenue", { "detail": revenue });
+    document.dispatchEvent(event);
   }
 
-  static getGraphsArray(data: Object[]) {
+  static getGraphsArray(data: Object[]):Object[] {
     let item: Object = data[0];
     let graphs: Object[] = [];
     let index:number = 1;
     for (let property in item) {
       if (item.hasOwnProperty(property) && property != 'date') {
-        console.log('Property: ' + property);
         let graph: Object = {
           "bullet": "round",
           "id": "AmGraph-" + index++,

@@ -7,6 +7,7 @@ import {NgModule} from "@angular/core";
 import {DonutChartComponent} from "./util/components/donut-chart/donut-chart.component";
 import {FundsService} from "./services/funds.service";
 import {LineChartComponent} from "./util/components/line-chart/line-chart.component";
+import {MaterialModule} from "@angular/material";
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import {LineChartComponent} from "./util/components/line-chart/line-chart.compon
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule
+    HttpModule,
+    MaterialModule
   ],
   providers: [FundsService],
   bootstrap: [AppComponent]
