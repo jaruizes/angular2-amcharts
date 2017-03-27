@@ -1,4 +1,7 @@
-import {Component, OnInit, Input, AfterViewInit, ViewChild, ElementRef, HostListener} from '@angular/core';
+import {
+  Component, OnInit, Input, AfterViewInit, ViewChild, ElementRef, HostListener,
+  NgZone
+} from '@angular/core';
 
 @Component({
   selector: 'line-chart',
@@ -6,7 +9,7 @@ import {Component, OnInit, Input, AfterViewInit, ViewChild, ElementRef, HostList
   styleUrls: ['line-chart.component.css']
 })
 export class LineChartComponent implements OnInit, AfterViewInit {
-  @ViewChild('habriaGanadoDiv') habriaGanadoDiv:ElementRef;
+  @ViewChild('shouldHaveEarnedDiv') shouldHaveEarnedDiv: ElementRef;
 
   /*
    Each object of the array has the following structure:
@@ -26,120 +29,132 @@ export class LineChartComponent implements OnInit, AfterViewInit {
    */
   @Input() options: Object;
 
-  private revenueAmount:number;
+  private revenueAmount: number;
+  private revenues:Object;
 
-  @HostListener('document:updateRevenue', ['$event'])
-  onupdateRevenue(ev) {
-    console.log('Update revenue!!' + ev.detail);
-    this.revenueAmount = ev.detail.toFixed(2);
+  constructor(private _ngZone: NgZone) {  }
+
+  @HostListener('document:showWouldHaveEarned', ['$event']) onShowWouldHaveEarned(ev) {
+    this.revenueAmount = this.revenues[ev.detail.date].toFixed(2);
+    this.shouldHaveEarnedDiv.nativeElement.style.display = 'block';
   }
 
-  constructor() {
+  @HostListener('document:hideWouldHaveEarned') onHideWouldHaveEarned() {
+    this.shouldHaveEarnedDiv.nativeElement.style.display = 'none';
   }
 
   ngOnInit() {
     console.log('Line Chart initializing.....');
     console.log(this.data);
+    this.revenues = LineChartComponent.calculateGlobalRevenue(this.data, 1000);
 
-  }
-
-  private updateRevenue(value) {
-    console.log(value);
   }
 
   ngAfterViewInit(): void {
     let chartsEngine = (window as any).AmCharts;
     let chartData: Object[] = this.data;
-    let habriaGanadoDiv: any = this.habriaGanadoDiv.nativeElement;
-    let revenues = LineChartComponent.calculateGlobalRevenue(this.data, 1000);
-    let updateRevenue = this.updateRevenue;
+    // TODO: Check if it's possible to move to <onShowWouldHaveEarned>
+    let shouldHaveEarnedDiv: any = this.shouldHaveEarnedDiv.nativeElement;
 
-    let chart: any = chartsEngine.makeChart(this.options['id2'], {
-      "type": "serial",
-      "theme": "none",
-      "addClassNames": true,
-      "categoryField": "date",
-      "chartScrollbar": {
-        "gridAlpha": 0,
-        "color": "#888888",
-        "scrollbarHeight": 55,
-        "backgroundAlpha": 0,
-        "selectedBackgroundAlpha": 0.1,
-        "selectedBackgroundColor": "#888888",
-        "graphFillAlpha": 0,
-        "selectedGraphFillAlpha": 0,
-        "graphLineAlpha": 0.2,
-        "graphLineColor": "#c2c2c2",
-        "selectedGraphLineColor": "#888888",
-        "selectedGraphLineAlpha": 1
-      },
-      "chartCursor": {
-        "cursorAlpha": 0,
-        "valueLineEnabled":true,
-        "valueLineBalloonEnabled":true,
-        "valueLineAlpha":0.5,
-        "fullWidth":true
-      },
-      "dataDateFormat": "MM/YYYY",
-      "categoryAxis": {
-        "position" : "bottom",
-        "gridThickness": 0,
-        "minPeriod": "YYYY"
-      },
-      "dataProvider": chartData,
-      "graphs": LineChartComponent.getGraphsArray(chartData),
-      "legend": {
-        "align": "left",
-        "valueAlign": "left",
-        "title": "COMPARA"
-      },
-      "allLabels": [
-        {
-          "text": "RENTABILIDAD AÑO A AÑO",
-          "size": "14",
-          "bold": true
+    this._ngZone.runOutsideAngular(() => {
+      // TODO: Extract chart build to service or parent class / component
+      let chart: any = chartsEngine.makeChart(this.options['id2'], {
+        "type": "serial",
+        "theme": "none",
+        "addClassNames": true,
+        "categoryField": "date",
+        "chartScrollbar": {
+          "gridAlpha": 0,
+          "color": "#888888",
+          "scrollbarHeight": 55,
+          "backgroundAlpha": 0,
+          "selectedBackgroundAlpha": 0.1,
+          "selectedBackgroundColor": "#888888",
+          "graphFillAlpha": 0,
+          "selectedGraphFillAlpha": 0,
+          "graphLineAlpha": 0.2,
+          "graphLineColor": "#c2c2c2",
+          "selectedGraphLineColor": "#888888",
+          "selectedGraphLineAlpha": 1
         },
-        {
-          "text": "",
-          "x": "!30",
-          "align": "right",
-          "size": "14",
-          "bold": true,
-          "id": "000023"
-        }
-      ],
-      "valueAxes": [{
-        "axisAlpha": 0,
-        "position": "left",
-        "fontSize": 11,
-        "color": "#a9a9a9",
-        "gridThickness": 1,
-        "dashLength": 5,
-        "zeroGridAlpha": 0
-      }],
-      "listeners": [
-        {
-          "event": "rollOverGraphItem",
-          "method": function(e) {
-            LineChartComponent.revenueCalculate(e, revenues, habriaGanadoDiv, updateRevenue);
+        "chartCursor": {
+          "cursorAlpha": 0,
+          "valueLineEnabled": true,
+          //"valueLineBalloonEnabled": true,
+          "valueLineAlpha": 0.5,
+          "fullWidth": true
+        },
+        "dataDateFormat": "MM/YYYY", // TODO: To be deleted
+        "categoryAxis": {
+          "position": "bottom",
+          "gridThickness": 0,
+          "minPeriod": "YYYY"        // TODO: To be deleted
+        },
+        "dataProvider": chartData,
+        "graphs": LineChartComponent.getGraphsArray(chartData),
+        "legend": {
+          "align": "left",
+          "valueAlign": "left",
+          "title": "COMPARA",
+          "valueText":"",
+          "valueWidth":0
+        },
+        "allLabels": [
+          {
+            "text": "RENTABILIDAD AÑO A AÑO",
+            "size": "14",
+            "bold": true
           }
-        }
-      ]
+        ],
+        "valueAxes": [{
+          "axisAlpha": 0,
+          "position": "left",
+          "fontSize": 11,
+          "color": "#a9a9a9",
+          "gridThickness": 1,
+          "dashLength": 5,
+          "zeroGridAlpha": 0
+        }],
+        "listeners": [
+          {
+            "event": "rollOverGraphItem",
+            "method": function (e) {
+              if (e.item.graph.valueField == 'Tu cartera') {
+                let event = new CustomEvent("showWouldHaveEarned", {
+                  "detail": {
+                    "date": e.item.dataContext.date
+                  }
+                });
+                document.dispatchEvent(event);
+              }
+            }
+          },
+          {
+            "event": "rollOutGraphItem",
+            "method": function () {
+              document.dispatchEvent(new CustomEvent("hideWouldHaveEarned"));
+            }
+          }
+        ]
+      });
+
+      chart.addListener('drawn', function (e) {
+        // TODO: This is done to positioning the div inside the chart div. Check if it's better do the same just with CSS
+        // TODO: and putting the div over the chart div
+        e.chart.chartDiv.insertBefore(shouldHaveEarnedDiv, e.chart.chartDiv.firstChild);
+      });
     });
 
-    chart.addListener('init', function(e) {
-      e.chart.chartDiv.insertBefore(habriaGanadoDiv, e.chart.chartDiv.firstChild);
-    });
   }
 
-  static calculateGlobalRevenue(data, initialInvestment):Object {
-    let revenues:Object = {};
-    let updatedInvestment:number = initialInvestment;
-    let investmentWithRevenue:number;
-    let yearProfitability:number;
+  static calculateGlobalRevenue(data, initialInvestment): Object {
+    let revenues: Object = {};
+    let updatedInvestment: number = initialInvestment;
+    let investmentWithRevenue: number;
+    let yearProfitability: number;
     for (let year of data) {
       yearProfitability = year['Tu cartera'];
-      investmentWithRevenue = updatedInvestment * (1 + yearProfitability/100);
+      investmentWithRevenue = updatedInvestment * (1 + yearProfitability / 100);
       revenues[year['date']] = investmentWithRevenue;
       updatedInvestment = investmentWithRevenue;
     }
@@ -147,21 +162,10 @@ export class LineChartComponent implements OnInit, AfterViewInit {
     return revenues;
   }
 
-  static revenueCalculate(e, revenues, habriaGanadoDiv, updateRevenue) {
-    if (e.item.graph.valueField != 'Tu cartera') {
-      return;
-    }
-
-    habriaGanadoDiv.style.display = 'block';
-    let revenue:number = revenues[e.item.dataContext.date];
-    let event = new CustomEvent("updateRevenue", { "detail": revenue });
-    document.dispatchEvent(event);
-  }
-
-  static getGraphsArray(data: Object[]):Object[] {
+  static getGraphsArray(data: Object[]): Object[] {
     let item: Object = data[0];
     let graphs: Object[] = [];
-    let index:number = 1;
+    let index: number = 1;
     for (let property in item) {
       if (item.hasOwnProperty(property) && property != 'date') {
         let graph: Object = {

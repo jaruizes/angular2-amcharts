@@ -1,4 +1,4 @@
-#habriaGanadoDiv {
+#shouldHaveEarnedDiv {
   float:right;
   height: 16px;
   font-family: AkkuratPro;
@@ -10,4 +10,5 @@
   letter-spacing: normal;
   color: #595959;
   display: none;
+  z-index: 99999999;
 }
