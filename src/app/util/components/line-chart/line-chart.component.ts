@@ -1,6 +1,6 @@
 import {
   Component, OnInit, Input, AfterViewInit, ViewChild, ElementRef, HostListener,
-  NgZone
+  NgZone, OnDestroy
 } from '@angular/core';
 
 @Component({
@@ -8,7 +8,8 @@ import {
   templateUrl: 'line-chart.component.html',
   styleUrls: ['line-chart.component.css']
 })
-export class LineChartComponent implements OnInit, AfterViewInit {
+export class LineChartComponent implements OnInit, AfterViewInit, OnDestroy {
+
   @ViewChild('shouldHaveEarnedDiv') shouldHaveEarnedDiv: ElementRef;
 
   /*
@@ -31,6 +32,7 @@ export class LineChartComponent implements OnInit, AfterViewInit {
 
   private revenueAmount: number;
   private revenues:Object;
+  private chart:any;
 
   constructor(private _ngZone: NgZone) {  }
 
@@ -50,13 +52,20 @@ export class LineChartComponent implements OnInit, AfterViewInit {
 
   }
 
+  ngOnDestroy(): void {
+    let chart = this.chart;
+    this._ngZone.runOutsideAngular(() => {
+      chart.clear();
+    });
+  }
+
   ngAfterViewInit(): void {
     let chartsEngine = (window as any).AmCharts;
     let chartData: Object[] = this.data;
     // TODO: Check if it's possible to move to <onShowWouldHaveEarned>
     let shouldHaveEarnedDiv: any = this.shouldHaveEarnedDiv.nativeElement;
 
-    this._ngZone.runOutsideAngular(() => {
+    this.chart = this._ngZone.runOutsideAngular(() => {
       // TODO: Extract chart build to service or parent class / component
       let chart: any = chartsEngine.makeChart(this.options['id2'], {
         "type": "serial",
@@ -143,6 +152,8 @@ export class LineChartComponent implements OnInit, AfterViewInit {
         // TODO: and putting the div over the chart div
         e.chart.chartDiv.insertBefore(shouldHaveEarnedDiv, e.chart.chartDiv.firstChild);
       });
+
+      return chart;
     });
 
   }
