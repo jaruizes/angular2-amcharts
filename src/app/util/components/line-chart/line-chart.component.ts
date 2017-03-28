@@ -10,8 +10,6 @@ import {
 })
 export class LineChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  @ViewChild('shouldHaveEarnedDiv') shouldHaveEarnedDiv: ElementRef;
-
   /*
    Each object of the array has the following structure:
    - label: string
@@ -33,16 +31,19 @@ export class LineChartComponent implements OnInit, AfterViewInit, OnDestroy {
   private revenueAmount: number;
   private revenues:Object;
   private chart:any;
+  private showShouldHaveEarned:boolean;
 
-  constructor(private _ngZone: NgZone) {  }
+  constructor(private _ngZone: NgZone) {
+    this.showShouldHaveEarned = false;
+  }
 
   @HostListener('document:showWouldHaveEarned', ['$event']) onShowWouldHaveEarned(ev) {
     this.revenueAmount = this.revenues[ev.detail.date].toFixed(2);
-    this.shouldHaveEarnedDiv.nativeElement.style.display = 'block';
+    this.showShouldHaveEarned = true;
   }
 
   @HostListener('document:hideWouldHaveEarned') onHideWouldHaveEarned() {
-    this.shouldHaveEarnedDiv.nativeElement.style.display = 'none';
+    //this.shouldHaveEarnedDiv.nativeElement.style.display = 'none';
   }
 
   ngOnInit() {
@@ -62,8 +63,6 @@ export class LineChartComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     let chartsEngine = (window as any).AmCharts;
     let chartData: Object[] = this.data;
-    // TODO: Check if it's possible to move to <onShowWouldHaveEarned>
-    let shouldHaveEarnedDiv: any = this.shouldHaveEarnedDiv.nativeElement;
 
     this.chart = this._ngZone.runOutsideAngular(() => {
       // TODO: Extract chart build to service or parent class / component
@@ -87,11 +86,18 @@ export class LineChartComponent implements OnInit, AfterViewInit, OnDestroy {
           "selectedGraphLineAlpha": 1
         },
         "chartCursor": {
-          "cursorAlpha": 0,
-          "valueLineEnabled": true,
-          //"valueLineBalloonEnabled": true,
+          "cursorAlpha": 1,
           "valueLineAlpha": 0.5,
-          "fullWidth": true
+          "listeners": [
+            {
+              "event": "changed",
+              "method": function (e) {
+                let index:number = e.chart.categoryAxis.xToIndex(e.x);
+                let date:string = e.chart.categoryAxis.data[index].category;
+                fireShowWouldHaveEarned(date);
+              }
+            }
+          ]
         },
         "dataDateFormat": "MM/YYYY", // TODO: To be deleted
         "categoryAxis": {
@@ -108,13 +114,13 @@ export class LineChartComponent implements OnInit, AfterViewInit, OnDestroy {
           "valueText":"",
           "valueWidth":0
         },
-        "allLabels": [
+        /*"allLabels": [
           {
             "text": "RENTABILIDAD AÑO A AÑO",
             "size": "14",
             "bold": true
           }
-        ],
+        ],*/
         "valueAxes": [{
           "axisAlpha": 0,
           "position": "left",
@@ -123,37 +129,31 @@ export class LineChartComponent implements OnInit, AfterViewInit, OnDestroy {
           "gridThickness": 1,
           "dashLength": 5,
           "zeroGridAlpha": 0
-        }],
+        }]
+        /*
+        This listener is not necessary because we're using chart cursor and capturing its change event
         "listeners": [
           {
             "event": "rollOverGraphItem",
             "method": function (e) {
               if (e.item.graph.valueField == 'Tu cartera') {
-                let event = new CustomEvent("showWouldHaveEarned", {
-                  "detail": {
-                    "date": e.item.dataContext.date
-                  }
-                });
-                document.dispatchEvent(event);
+                fireShowWouldHaveEarned(e.item.dataContext.date);
               }
             }
-          },
-          {
-            "event": "rollOutGraphItem",
-            "method": function () {
-              document.dispatchEvent(new CustomEvent("hideWouldHaveEarned"));
-            }
           }
-        ]
-      });
-
-      chart.addListener('drawn', function (e) {
-        // TODO: This is done to positioning the div inside the chart div. Check if it's better do the same just with CSS
-        // TODO: and putting the div over the chart div
-        e.chart.chartDiv.insertBefore(shouldHaveEarnedDiv, e.chart.chartDiv.firstChild);
+        ]*/
       });
 
       return chart;
+
+      function fireShowWouldHaveEarned(value) {
+        let event = new CustomEvent("showWouldHaveEarned", {
+          "detail": {
+            "date": value
+          }
+        });
+        document.dispatchEvent(event);
+      }
     });
 
   }

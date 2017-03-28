@@ -1,7 +1,12 @@
 <!-- this is the chart -->
-<div [id]="options['id2']" [style.width.%]="100" [style.height.px]="500" class="mytest"></div>
-<div id="shouldHaveEarnedDiv" #shouldHaveEarnedDiv>
-  HABRIA GANADO {{revenueAmount}} €
-  <i class="material-icons">info_outline</i>
+<div class="lineChartTitle" #chartTitle>
+  <div class="leftTitle">
+    RENTABILIDAD AÑO A AÑO
+  </div>
+  <div class="shouldHaveEarned" *ngIf="showShouldHaveEarned">
+    HABRIA GANADO <span class="amountEarned">{{revenueAmount}} € </span>
+    <i class="material-icons">info_outline</i>
+  </div>
 </div>
+<div [id]="options['id2']" [style.width.%]="100" [style.height.px]="500" class="mytest"></div>
 

@@ -1,6 +1,20 @@
-#shouldHaveEarnedDiv {
+.lineChartTitle {
+  width: 100%;
+  z-index: 99999999;
+}
+.leftTitle {
+  float:left;
+  font-family: AkkuratPro;
+  font-size: 14px;
+  font-weight: bold;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: center;
+}
+.shouldHaveEarned {
   float:right;
-  height: 16px;
   font-family: AkkuratPro;
   font-size: 14px;
   font-weight: 300;
@@ -9,6 +23,15 @@
   line-height: normal;
   letter-spacing: normal;
   color: #595959;
-  display: none;
-  z-index: 99999999;
+  display: block;
+}
+
+.amountEarned {
+  font-size: 23px;
+  font-weight: bold;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  color: #595959;
 }
