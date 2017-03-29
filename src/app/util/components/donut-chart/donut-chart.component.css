@@ -1,51 +1,55 @@
-.amcharts-legend-balloon {
-  position: fixed;
-  pointer-events: none;
-  opacity: 0;
-  -webkit-transition: opacity 0.3s 0.04s;
-  transition: opacity 0.3s 0.04s;
-  visibility: hidden;
+.donutChartLegend {
+  margin: auto;
+  width: 60%;
+  padding: 10px;
+  display: flex;
 }
 
-.amcharts-legend-balloon > div {
+.tooltip {
   position: relative;
-  background-color: rgba(0, 0, 0, .9);
-  border: 2px solid #000;
-  padding: 4px 8px;
-  left: -50%;
-  color: #ffffff;
+  display: inline-block;
+  flex: 1;
+  font-family: AkkuratPro;
+  font-size: 13px;
+  font-weight: bold;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  color: #595959;
+  float: left;
 }
 
-.amcharts-legend-balloon > div:after,
-.amcharts-legend-balloon > div:before {
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+  top: 125%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+/* Tooltip arrow */
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
   bottom: 100%;
   left: 50%;
-  border: solid transparent;
-  content: " ";
-  height: 0;
-  width: 0;
-  position: absolute;
-  pointer-events: none;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color:  transparent transparent #555 transparent;
 }
 
-.amcharts-legend-balloon > div:after {
-  border-color: rgba(0, 0, 0, 0);
-  border-bottom-color: #000000;
-  border-width: 6px;
-  margin-left: -6px;
-}
-
-.amcharts-legend-balloon > div:before {
-  border-color: rgba(0, 0, 0, 0);
-  border-bottom-color: inherit;
-  border-width: 9px;
-  margin-left: -9px;
-}
-/* ACTIVE STATE */
-
-.amcharts-legend-balloon.active {
-  opacity: 1;
-  -webkit-transition: opacity 0s 0s;
-  transition: opacity 0s 0s;
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
   visibility: visible;
+  opacity: 1;
 }
+

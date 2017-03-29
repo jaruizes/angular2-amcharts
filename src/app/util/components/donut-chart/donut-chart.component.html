@@ -1,6 +1,9 @@
 <!-- this is the chart -->
-<div [id]="options['id1']" [style.width.%]="100" [style.height.px]="500" class="mytest"></div>
-<div id="legendTooltipDiv" #legendTooltipDiv>
-  <div id="legendTooltipContainer" #legendTooltipContainer></div>
+<div class="donutChartLegend">
+  <div class="tooltip" *ngFor="let item of chartData; let first = first;">
+    <span *ngIf="!first"> | </span> {{ item.category }} {{ item.total }} %
+    <span class="tooltiptext" *ngIf="item.description != null">{{item.description}}</span>
+  </div>
 </div>
+<base-chart [chartId]="chartId" [chartOptions]="chartOptions"></base-chart>
 

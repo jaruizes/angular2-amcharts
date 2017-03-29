@@ -1,196 +1,160 @@
-import {
-  Component, OnInit, Input, AfterViewInit, ViewChild, ElementRef, HostListener,
-  NgZone, OnDestroy
-} from '@angular/core';
+import {Component, HostListener, Input, OnInit} from '@angular/core';
 
 @Component({
   selector: 'line-chart',
   templateUrl: 'line-chart.component.html',
   styleUrls: ['line-chart.component.css']
 })
-export class LineChartComponent implements OnInit, AfterViewInit, OnDestroy {
+export class LineChartComponent implements OnInit {
 
-  /*
-   Each object of the array has the following structure:
-   - label: string
-   - value: number
-   - graphTooltip: string
-   - legendTooltip: string
-   - color: string
-   */
-  @Input() data: Object[];
-  /*
-   This object has the following structure:
-   - id
-   - height
-   - width
-   - title
-   */
-  @Input() options: Object;
+  // This is the unique id of the chart.
+  @Input() chartId: string;
+
+  // This is the id of the customer investment portfolio.
+  @Input() customerInvestmentPortfolio: string;
+
+  // This is the initial investment
+  @Input() initialInvestment: number;
+
+  // This is the data
+  @Input() chartData: Object[];
 
   private revenueAmount: number;
-  private revenues:Object;
-  private chart:any;
-  private showShouldHaveEarned:boolean;
+  private revenues: Object = {};
+  private showShouldHaveEarned: boolean;
+  private chartOptions: Object;
 
-  constructor(private _ngZone: NgZone) {
+  constructor() {
     this.showShouldHaveEarned = false;
   }
 
+  /**
+   * Listens to 'showWouldHaveEarned' event fired by Amcharts library to update the value
+   * of showWouldHaveEarned
+   * @param ev
+   */
   @HostListener('document:showWouldHaveEarned', ['$event']) onShowWouldHaveEarned(ev) {
-    this.revenueAmount = this.revenues[ev.detail.date].toFixed(2);
+    this.revenueAmount = this.revenues[ev.detail.date];
     this.showShouldHaveEarned = true;
   }
 
-  @HostListener('document:hideWouldHaveEarned') onHideWouldHaveEarned() {
-    //this.shouldHaveEarnedDiv.nativeElement.style.display = 'none';
-  }
-
   ngOnInit() {
-    console.log('Line Chart initializing.....');
-    console.log(this.data);
-    this.revenues = LineChartComponent.calculateGlobalRevenue(this.data, 1000);
+    // Calculates all the revenues. By this way just one calculation operation is done.
+    this._calculateGlobalRevenue();
 
-  }
-
-  ngOnDestroy(): void {
-    let chart = this.chart;
-    this._ngZone.runOutsideAngular(() => {
-      chart.clear();
-    });
-  }
-
-  ngAfterViewInit(): void {
-    let chartsEngine = (window as any).AmCharts;
-    let chartData: Object[] = this.data;
-
-    this.chart = this._ngZone.runOutsideAngular(() => {
-      // TODO: Extract chart build to service or parent class / component
-      let chart: any = chartsEngine.makeChart(this.options['id2'], {
-        "type": "serial",
-        "theme": "none",
-        "addClassNames": true,
-        "categoryField": "date",
-        "chartScrollbar": {
-          "gridAlpha": 0,
-          "color": "#888888",
-          "scrollbarHeight": 55,
-          "backgroundAlpha": 0,
-          "selectedBackgroundAlpha": 0.1,
-          "selectedBackgroundColor": "#888888",
-          "graphFillAlpha": 0,
-          "selectedGraphFillAlpha": 0,
-          "graphLineAlpha": 0.2,
-          "graphLineColor": "#c2c2c2",
-          "selectedGraphLineColor": "#888888",
-          "selectedGraphLineAlpha": 1
-        },
-        "chartCursor": {
-          "cursorAlpha": 1,
-          "valueLineAlpha": 0.5,
-          "listeners": [
-            {
-              "event": "changed",
-              "method": function (e) {
-                let index:number = e.chart.categoryAxis.xToIndex(e.x);
-                let date:string = e.chart.categoryAxis.data[index].category;
-                fireShowWouldHaveEarned(date);
-              }
-            }
-          ]
-        },
-        "dataDateFormat": "MM/YYYY", // TODO: To be deleted
-        "categoryAxis": {
-          "position": "bottom",
-          "gridThickness": 0,
-          "minPeriod": "YYYY"        // TODO: To be deleted
-        },
-        "dataProvider": chartData,
-        "graphs": LineChartComponent.getGraphsArray(chartData),
-        "legend": {
-          "align": "left",
-          "valueAlign": "left",
-          "title": "COMPARA",
-          "valueText":"",
-          "valueWidth":0
-        },
-        /*"allLabels": [
+    // This is the JSON object required for AmCharts to make the line graph
+    this.chartOptions = {
+      'type': 'serial',
+      'theme': 'none',
+      'addClassNames': true,
+      'categoryField': 'date',
+      'chartScrollbar': {
+        'gridAlpha': 0,
+        'color': '#888888',
+        'scrollbarHeight': 55,
+        'backgroundAlpha': 0,
+        'selectedBackgroundAlpha': 0.1,
+        'selectedBackgroundColor': '#888888',
+        'graphFillAlpha': 0,
+        'selectedGraphFillAlpha': 0,
+        'graphLineAlpha': 0.2,
+        'graphLineColor': '#c2c2c2',
+        'selectedGraphLineColor': '#888888',
+        'selectedGraphLineAlpha': 1
+      },
+      'chartCursor': {
+        'cursorAlpha': 1,
+        'valueLineAlpha': 0.5,
+        'listeners': [
           {
-            "text": "RENTABILIDAD AÑO A AÑO",
-            "size": "14",
-            "bold": true
+            'event': 'changed',
+            'method': LineChartComponent._fireShowWouldHaveEarned
           }
-        ],*/
-        "valueAxes": [{
-          "axisAlpha": 0,
-          "position": "left",
-          "fontSize": 11,
-          "color": "#a9a9a9",
-          "gridThickness": 1,
-          "dashLength": 5,
-          "zeroGridAlpha": 0
-        }]
-        /*
-        This listener is not necessary because we're using chart cursor and capturing its change event
-        "listeners": [
-          {
-            "event": "rollOverGraphItem",
-            "method": function (e) {
-              if (e.item.graph.valueField == 'Tu cartera') {
-                fireShowWouldHaveEarned(e.item.dataContext.date);
-              }
-            }
-          }
-        ]*/
-      });
-
-      return chart;
-
-      function fireShowWouldHaveEarned(value) {
-        let event = new CustomEvent("showWouldHaveEarned", {
-          "detail": {
-            "date": value
-          }
-        });
-        document.dispatchEvent(event);
-      }
-    });
-
+        ]
+      },
+      'categoryAxis': {
+        'position': 'bottom',
+        'gridThickness': 0,
+      },
+      'dataProvider': this.chartData,
+      'graphs': LineChartComponent._getGraphsArray(this.chartData, this.customerInvestmentPortfolio),
+      'legend': {
+        'align': 'left',
+        'valueAlign': 'left',
+        'title': 'COMPARA',  // TODO: i18n
+        'valueText': '',
+        'valueWidth': 0
+      },
+      'valueAxes': [{
+        'axisAlpha': 0,
+        'position': 'left',
+        'fontSize': 11,
+        'color': '#a9a9a9',
+        'gridThickness': 1,
+        'dashLength': 5,
+        'zeroGridAlpha': 0
+      }]
+    };
   }
 
-  static calculateGlobalRevenue(data, initialInvestment): Object {
-    let revenues: Object = {};
-    let updatedInvestment: number = initialInvestment;
+  /**
+   * Calculates all the revenues based on profitability of each year and the initial investment.
+   * Returns an Object with a key per each date in data. The value of each key is the revenue.
+   * @private
+   */
+  _calculateGlobalRevenue(): void {
+    let updatedInvestment: number = this.initialInvestment;
     let investmentWithRevenue: number;
     let yearProfitability: number;
-    for (let year of data) {
-      yearProfitability = year['Tu cartera'];
+
+    for (let year of this.chartData) {
+      yearProfitability = year[this.customerInvestmentPortfolio];
       investmentWithRevenue = updatedInvestment * (1 + yearProfitability / 100);
-      revenues[year['date']] = investmentWithRevenue;
+      this.revenues[year['date']] = investmentWithRevenue.toFixed(2);
       updatedInvestment = investmentWithRevenue;
     }
-
-    return revenues;
   }
 
-  static getGraphsArray(data: Object[]): Object[] {
+  /**
+   * Creates and fires the showWouldHaveEarned event
+   * This function will be invoked by Amcharts library when the internal 'change event' is fired
+   * @param e
+   * @private
+   */
+  static _fireShowWouldHaveEarned(e) {
+    let index: number = e.chart.categoryAxis.xToIndex(e.x);
+    let date: string = e.chart.categoryAxis.data[index].category;
+    let event = new CustomEvent('showWouldHaveEarned', {
+      'detail': {
+        'date': date
+      }
+    });
+    document.dispatchEvent(event);
+  }
+
+  /**
+   * Creates the 'graphs' node necessary to create the serial chart
+   * @param data
+   * @param customerInvestmentPortfolio
+   * @returns {Object[]}
+   * @private
+   */
+  static _getGraphsArray(data: Object[], customerInvestmentPortfolio): Object[] {
     let item: Object = data[0];
     let graphs: Object[] = [];
     let index: number = 1;
     for (let property in item) {
       if (item.hasOwnProperty(property) && property != 'date') {
         let graph: Object = {
-          "bullet": "round",
-          "id": "AmGraph-" + index++,
-          "type": "smoothedLine",
-          "valueField": property,
-          "title": property,
-          "hidden": true
+          'bullet': 'round',
+          'type': 'smoothedLine',
+          'valueField': property,
+          'title': property,
+          'hidden': true
         };
 
-        if (property == 'Tu cartera') {
+        if (property == customerInvestmentPortfolio) {
           graph['lineColor'] = '#00dbd0';
-          graph['fillColors'] = '#00dbd0';
           graph['hidden'] = false;
         }
 

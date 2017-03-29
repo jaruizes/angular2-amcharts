@@ -1,6 +1,6 @@
 <h1>This is the sliced chart</h1>
-<donut-chart [data]="donutChartData" [options]="options"></donut-chart>
-
+<donut-chart [chartData]="donutChartData" chartId="idDonut"></donut-chart>
 
 <h1>This is the line chart</h1>
-<line-chart [data]="lineChartData" [options]="options"></line-chart>
+<line-chart [chartData]="lineChartData" chartId="idLine" [customerInvestmentPortfolio]="customerInvestmentPortfolio"
+            initialInvestment="1000"></line-chart>
