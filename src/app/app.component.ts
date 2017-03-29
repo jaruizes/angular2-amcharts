@@ -19,6 +19,7 @@ export class AppComponent {
     this.lineChartData = fundsService.getProfitability();
     this.idDonut = 'chart001';
     this.idLine = 'chart002';
+    this.customerInvestmentPortfolio = 'Tu cartera';
   }
 
   rollOverSlice(e) {
