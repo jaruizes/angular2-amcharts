@@ -20,4 +20,9 @@ export class AppComponent {
     this.idDonut = 'chart001';
     this.idLine = 'chart002';
   }
+
+  rollOverSlice(e) {
+    console.log('rollOverSlice recived!!!!');
+    console.log(e.data);
+  }
 }

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, EventEmitter, HostListener, Input, OnInit, Output} from "@angular/core";
 
 @Component({
   selector: 'donut-chart',
@@ -12,6 +12,15 @@ export class DonutChartComponent implements OnInit {
 
   // This is the data
   @Input() chartData: Object[];
+
+  // This component will emit 'rollOverSlice' with the data of the slice attached
+  @Output('rollOverSlice') rollOverSlice = new EventEmitter<Object>();
+
+  // Listen to rollOverSlice local event
+  @HostListener('document:rollOverSlice',['$event']) onRollOverSlice(e) {
+    console.log('rollOverSlice emitedd!!!!');
+    this.rollOverSlice.emit(e.detail);
+  }
 
   private chartOptions: Object;
   constructor() {  }
@@ -37,7 +46,11 @@ export class DonutChartComponent implements OnInit {
         'fillColor': '#000000'
       },
       'colors': ['#ffd600', '#13cec4', '#db9e01'],
-      'dataProvider': this.chartData
+      'dataProvider': this.chartData,
+      "listeners": [{
+        "event": "rollOverSlice",
+        "method": DonutChartComponent._fireRollOverSlice
+      }]
     };
   }
 
@@ -65,6 +78,21 @@ export class DonutChartComponent implements OnInit {
     }
     return fundHTML.outerHTML;
 
+  }
+
+  /**
+   * Creates and fires the showWouldHaveEarned event
+   * This function will be invoked by Amcharts library when the internal 'change event' is fired
+   * @param e
+   * @private
+   */
+  static _fireRollOverSlice(e) {
+    let event = new CustomEvent('rollOverSlice', {
+      'detail': {
+        'data': e.dataItem['dataContext']
+      }
+    });
+    document.dispatchEvent(event);
   }
 
 }
