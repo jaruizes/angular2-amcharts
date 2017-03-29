@@ -142,7 +142,6 @@ export class LineChartComponent implements OnInit {
   static _getGraphsArray(data: Object[], customerInvestmentPortfolio): Object[] {
     let item: Object = data[0];
     let graphs: Object[] = [];
-    let index: number = 1;
     for (let property in item) {
       if (item.hasOwnProperty(property) && property != 'date') {
         let graph: Object = {
@@ -156,6 +155,7 @@ export class LineChartComponent implements OnInit {
         if (property == customerInvestmentPortfolio) {
           graph['lineColor'] = '#00dbd0';
           graph['hidden'] = false;
+          graph['switchable'] = false;
         }
 
         graphs.push(graph);
